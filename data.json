@@ -3,5 +3,10 @@
     "name": "The Catalogue itself",
     "desc": "Built 2026-07-13. The first thing I've ever put live on the internet.",
     "link": "https://raj117m.github.io/"
+  },
+  {
+    "name": "Kg-Calibrator",
+    "desc": "A phone-first tracker that finds my personal calories-per-kg number. Log daily calories in and out; every fourth entry it asks my weight; once it has two weight readings, it tells me exactly how much deficit I need to lose 1 kg — for my body, not a generic formula.",
+    "link": "https://raj117m.github.io/kg-calibrator/"
   }
 ]
