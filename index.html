@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raj's Catalogue</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    max-width: 640px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+    line-height: 1.5;
+    color: #1a1a1a;
+    background: #fdfdfd;
+  }
+  header {
+    margin-bottom: 2.5rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+  }
+  header p {
+    color: #666;
+    margin-top: 0;
+  }
+  ol {
+    list-style: none;
+    padding: 0;
+    counter-reset: item;
+  }
+  li {
+    counter-increment: item;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  li::before {
+    content: "#" counter(item);
+    font-weight: 600;
+    color: #999;
+    flex-shrink: 0;
+    width: 2.5rem;
+  }
+  li .title {
+    font-weight: 500;
+  }
+  li .desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.15rem;
+  }
+  footer {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: #999;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { color: #eaeaea; background: #121212; }
+    header p, li .desc, footer { color: #999; }
+    li { border-bottom-color: #2a2a2a; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Raj's Catalogue</h1>
+    <p>A running list of things I've made.</p>
+  </header>
+
+  <ol>
+    <li>
+      <div>
+        <div class="title">The Catalogue itself</div>
+        <div class="desc">This website — item #1.</div>
+      </div>
+    </li>
+  </ol>
+
+  <footer>
+    Updated as I make new things.
+  </footer>
+</body>
+</html>
