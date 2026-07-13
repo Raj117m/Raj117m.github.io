@@ -55,6 +55,21 @@
     font-size: 0.9rem;
     margin-top: 0.15rem;
   }
+  li .link {
+    display: inline-block;
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: #0366d6;
+    text-decoration: none;
+  }
+  li .link:hover {
+    text-decoration: underline;
+  }
+  section > h2 {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 1rem;
+  }
   footer {
     margin-top: 3rem;
     font-size: 0.85rem;
@@ -65,23 +80,29 @@
     body { color: #eaeaea; background: #121212; }
     header p, li .desc, footer { color: #999; }
     li { border-bottom-color: #2a2a2a; }
+    section > h2 { color: #aaa; }
+    li .link { color: #58a6ff; }
   }
 </style>
 </head>
 <body>
   <header>
     <h1>Raj</h1>
-    <p>A catalogue of things I make</p>
+    <p>A catalogue of things I make.</p>
   </header>
 
-  <ol>
-    <li>
-      <div>
-        <div class="title">Item #1 — This catalogue itself</div>
-        <div class="desc">Shipped 2026-07-13. First thing I've ever put live on the internet.</div>
-      </div>
-    </li>
-  </ol>
+  <section>
+    <h2>Creations</h2>
+    <ol>
+      <li>
+        <div>
+          <div class="title">Item #1 — The Catalogue itself</div>
+          <div class="desc">Built 2026-07-13. The first thing I've ever put live on the internet.</div>
+          <a class="link" href="https://raj117m.github.io/">View</a>
+        </div>
+      </li>
+    </ol>
+  </section>
 
   <footer>
     Updated as I make new things.
