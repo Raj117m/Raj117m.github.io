@@ -8,5 +8,10 @@
     "name": "Kg-Calibrator",
     "desc": "A phone-first tracker that finds my personal calories-per-kg number. Log daily calories in and out; every fourth entry it asks my weight; once it has two weight readings, it tells me exactly how much deficit I need to lose 1 kg — for my body, not a generic formula.",
     "link": "https://raj117m.github.io/kg-calibrator/"
+  },
+  {
+    "name": "Personal Cloud Backend",
+    "desc": "A self-hosted API and file store running on my own hardware, accessible at cloud.atomz.online from anywhere in the world. Handles structured data and file uploads for any future creation. Auto-starts on boot, auto-restarts on crash, real HTTPS through Cloudflare Tunnel — no rented cloud, no free-tier dependency. The plumbing under every creation from here on.",
+    "link": "https://cloud.atomz.online"
   }
 ]
