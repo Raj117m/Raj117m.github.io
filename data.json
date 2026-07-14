@@ -11,11 +11,6 @@
   },
   {
     "name": "Personal Cloud Backend",
-    "desc": "A self-hosted API and file store running on my own hardware, accessible at cloud.atomz.online from anywhere in the world. Handles structured data and file uploads for any future creation. Auto-starts on boot, auto-restarts on crash, real HTTPS through Cloudflare Tunnel — no rented cloud, no free-tier dependency. The plumbing under every creation from here on.",
-    "link": "https://cloud.atomz.online"
-  },
-  {
-    "name": "Personal Cloud Backend",
     "desc": "Self-hosted API and file store running on my own hardware at cloud.atomz.online. Serves data and files for any of my creations, replacing dependence on third-party cloud services. Fully owned stack — no rented servers, no free-tier lock-in.",
     "link": "https://cloud.atomz.online/admin"
   }
