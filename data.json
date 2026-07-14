@@ -13,5 +13,10 @@
     "name": "Personal Cloud Backend",
     "desc": "Self-hosted API and file store running on my own hardware at cloud.atomz.online. Serves data and files for any of my creations, replacing dependence on third-party cloud services. Fully owned stack — no rented servers, no free-tier lock-in.",
     "link": "https://cloud.atomz.online/admin"
+  },
+  {
+    "name": "GateCurry",
+    "desc": "A phone-first fuel and mileage tracker for my Grand i10. Log odometer and liters at each fill-up, and it calculates true km-per-liter, cost-per-km, and average mileage over time. Uses my own cloud backend.",
+    "link": "https://cloud.atomz.online/apps/fuel-tracker/"
   }
 ]
