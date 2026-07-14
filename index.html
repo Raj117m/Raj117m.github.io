@@ -69,6 +69,70 @@
     color: #999;
     font-size: 0.9rem;
   }
+  li .entry-view {
+    flex: 1;
+  }
+  li .actions, li .confirm-delete {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .action-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.85rem;
+    color: #0366d6;
+    cursor: pointer;
+  }
+  .action-btn:hover {
+    text-decoration: underline;
+  }
+  .confirm-delete span {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  li .entry-edit-form {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 400px;
+  }
+  li .entry-edit-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8rem;
+    color: #666;
+    gap: 0.25rem;
+  }
+  li .entry-edit-form input {
+    font: inherit;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  li .entry-edit-form .edit-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  li .entry-edit-form button[type="submit"] {
+    align-self: flex-start;
+    font: inherit;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #0366d6;
+    background: #0366d6;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  li .entry-edit-form button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
   section > h2 {
     font-size: 1.1rem;
     color: #444;
@@ -163,6 +227,14 @@
     }
     .status.success { background: #123312; color: #6fcf6f; }
     .status.error { background: #331212; color: #ff8080; }
+    .action-btn { color: #58a6ff; }
+    .confirm-delete span { color: #999; }
+    li .entry-edit-form label { color: #999; }
+    li .entry-edit-form input {
+      background: #1c1c1c;
+      color: #eaeaea;
+      border-color: #333;
+    }
   }
 </style>
 </head>
@@ -249,7 +321,10 @@
       }).join(''));
     }
 
+    var currentEntries = [];
+
     function renderEntries(entries) {
+      currentEntries = entries;
       var ol = document.getElementById('creations-list');
       if (!entries.length) {
         ol.innerHTML = '<li class="empty">No entries yet.</li>';
@@ -258,12 +333,33 @@
       ol.innerHTML = '';
       entries.forEach(function (entry, i) {
         var li = document.createElement('li');
+        li.dataset.idx = i;
         li.innerHTML =
-          '<div>' +
+          '<div class="entry-view">' +
             '<div class="title">Item #' + (i + 1) + ' — ' + escapeHtml(entry.name) + '</div>' +
             '<div class="desc">' + escapeHtml(entry.desc) + '</div>' +
             '<a class="link" href="' + escapeHtml(entry.link) + '">View</a>' +
-          '</div>';
+            '<div class="actions">' +
+              '<button type="button" class="action-btn edit-btn">Edit</button>' +
+              '<button type="button" class="action-btn delete-btn">Delete</button>' +
+            '</div>' +
+            '<div class="confirm-delete" hidden>' +
+              '<span>Delete this entry?</span>' +
+              '<button type="button" class="action-btn confirm-yes">Yes</button>' +
+              '<button type="button" class="action-btn confirm-no">No</button>' +
+            '</div>' +
+            '<div class="delete-status status" hidden></div>' +
+          '</div>' +
+          '<form class="entry-edit-form" hidden>' +
+            '<label>Name<input type="text" class="edit-name" required></label>' +
+            '<label>Description<input type="text" class="edit-desc" required></label>' +
+            '<label>Link<input type="url" class="edit-link" required></label>' +
+            '<div class="edit-actions">' +
+              '<button type="submit">Save</button>' +
+              '<button type="button" class="action-btn cancel-edit-btn">Cancel</button>' +
+            '</div>' +
+            '<div class="edit-status status" hidden></div>' +
+          '</form>';
         ol.appendChild(li);
       });
     }
@@ -280,7 +376,7 @@
         });
     }
 
-    function commitNewEntry(name, desc, link) {
+    function commitMutatedEntries(mutateFn, message) {
       var token = getToken();
       if (!token) {
         return Promise.reject(new Error('No GitHub token saved yet — open Settings below and paste one in first.'));
@@ -295,9 +391,9 @@
           return getRes.json();
         })
         .then(function (getJson) {
-          var currentEntries = JSON.parse(b64DecodeUnicode(getJson.content.replace(/\n/g, '')));
-          currentEntries.push({ name: name, desc: desc, link: link });
-          var newContent = b64EncodeUnicode(JSON.stringify(currentEntries, null, 2) + '\n');
+          var freshEntries = JSON.parse(b64DecodeUnicode(getJson.content.replace(/\n/g, '')));
+          var newEntries = mutateFn(freshEntries);
+          var newContent = b64EncodeUnicode(JSON.stringify(newEntries, null, 2) + '\n');
 
           return fetch(apiUrl, {
             method: 'PUT',
@@ -307,7 +403,7 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              message: 'Add creation: ' + name,
+              message: message,
               content: newContent,
               sha: getJson.sha,
               branch: BRANCH
@@ -318,9 +414,30 @@
                 throw new Error('GitHub rejected the update (status ' + putRes.status + '): ' + (errBody.message || 'unknown error'));
               });
             }
-            return currentEntries;
+            return newEntries;
           });
         });
+    }
+
+    function commitNewEntry(name, desc, link) {
+      return commitMutatedEntries(function (entries) {
+        entries.push({ name: name, desc: desc, link: link });
+        return entries;
+      }, 'Add creation: ' + name);
+    }
+
+    function commitEditedEntry(idx, name, desc, link) {
+      return commitMutatedEntries(function (entries) {
+        entries[idx] = { name: name, desc: desc, link: link };
+        return entries;
+      }, 'Edit creation: ' + name);
+    }
+
+    function commitDeletedEntry(idx, name) {
+      return commitMutatedEntries(function (entries) {
+        entries.splice(idx, 1);
+        return entries;
+      }, 'Delete creation: ' + name);
     }
 
     document.getElementById('add-form').addEventListener('submit', function (e) {
@@ -351,6 +468,79 @@
         .finally(function () {
           btn.disabled = false;
           btn.textContent = 'Add Creation';
+        });
+    });
+
+    var creationsList = document.getElementById('creations-list');
+
+    creationsList.addEventListener('click', function (e) {
+      var li = e.target.closest('li[data-idx]');
+      if (!li) return;
+      var idx = Number(li.dataset.idx);
+      var entry = currentEntries[idx];
+
+      if (e.target.classList.contains('edit-btn')) {
+        li.querySelector('.entry-view').hidden = true;
+        var form = li.querySelector('.entry-edit-form');
+        form.querySelector('.edit-name').value = entry.name;
+        form.querySelector('.edit-desc').value = entry.desc;
+        form.querySelector('.edit-link').value = entry.link;
+        form.hidden = false;
+      } else if (e.target.classList.contains('cancel-edit-btn')) {
+        li.querySelector('.entry-edit-form').hidden = true;
+        li.querySelector('.entry-view').hidden = false;
+      } else if (e.target.classList.contains('delete-btn')) {
+        li.querySelector('.actions').hidden = true;
+        li.querySelector('.confirm-delete').hidden = false;
+      } else if (e.target.classList.contains('confirm-no')) {
+        li.querySelector('.confirm-delete').hidden = true;
+        li.querySelector('.actions').hidden = false;
+      } else if (e.target.classList.contains('confirm-yes')) {
+        var yesBtn = e.target;
+        var deleteStatusEl = li.querySelector('.delete-status');
+        yesBtn.disabled = true;
+        yesBtn.textContent = 'Deleting…';
+        deleteStatusEl.hidden = true;
+        commitDeletedEntry(idx, entry.name)
+          .then(function (updatedEntries) {
+            renderEntries(updatedEntries);
+          })
+          .catch(function (err) {
+            yesBtn.disabled = false;
+            yesBtn.textContent = 'Yes';
+            deleteStatusEl.className = 'status error';
+            deleteStatusEl.textContent = err.message;
+            deleteStatusEl.hidden = false;
+          });
+      }
+    });
+
+    creationsList.addEventListener('submit', function (e) {
+      var li = e.target.closest('li[data-idx]');
+      if (!li || !e.target.classList.contains('entry-edit-form')) return;
+      e.preventDefault();
+      var idx = Number(li.dataset.idx);
+      var form = e.target;
+      var name = form.querySelector('.edit-name').value.trim();
+      var desc = form.querySelector('.edit-desc').value.trim();
+      var link = form.querySelector('.edit-link').value.trim();
+      var statusEl = form.querySelector('.edit-status');
+      var btn = form.querySelector('button[type="submit"]');
+
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      statusEl.hidden = true;
+
+      commitEditedEntry(idx, name, desc, link)
+        .then(function (updatedEntries) {
+          renderEntries(updatedEntries);
+        })
+        .catch(function (err) {
+          statusEl.className = 'status error';
+          statusEl.textContent = err.message;
+          statusEl.hidden = false;
+          btn.disabled = false;
+          btn.textContent = 'Save';
         });
     });
 
