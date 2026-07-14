@@ -37,9 +37,15 @@
     counter-increment: item;
     display: flex;
     gap: 1rem;
-    padding: 1rem 0;
+    padding: 1rem 0.5rem;
+    margin: 0 -0.5rem;
     border-bottom: 1px solid #e5e5e5;
+    border-radius: 6px;
     position: relative;
+    transition: background 0.15s ease;
+  }
+  li:hover {
+    background: #f7f7f7;
   }
   li::before {
     content: "#" counter(item);
@@ -257,6 +263,7 @@
     body { color: #eaeaea; background: #121212; }
     header p, li .desc, footer, details p.hint { color: #999; }
     li { border-bottom-color: #2a2a2a; }
+    li:hover { background: #1a1a1a; }
     section > h2 { color: #aaa; }
     li .link { color: #58a6ff; }
     details summary { color: #58a6ff; }
