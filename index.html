@@ -39,6 +39,7 @@
     gap: 1rem;
     padding: 1rem 0;
     border-bottom: 1px solid #e5e5e5;
+    position: relative;
   }
   li::before {
     content: "#" counter(item);
@@ -71,8 +72,9 @@
   }
   li .entry-view {
     flex: 1;
+    padding-right: 1.75rem;
   }
-  li .actions, li .confirm-delete {
+  li .confirm-delete {
     margin-top: 0.5rem;
     display: flex;
     align-items: center;
@@ -93,6 +95,45 @@
   .confirm-delete span {
     font-size: 0.85rem;
     color: #666;
+  }
+  .options-btn {
+    position: absolute;
+    top: 1rem;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: #999;
+    padding: 0.15rem 0.4rem;
+  }
+  .options-btn:hover {
+    color: #0366d6;
+  }
+  .entry-menu {
+    position: absolute;
+    top: 2.1rem;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 0.4rem;
+    min-width: 90px;
+  }
+  .entry-menu .action-btn {
+    text-align: left;
+    padding: 0.25rem 0.4rem;
+  }
+  .entry-menu .action-btn:hover {
+    text-decoration: none;
+    background: #f2f2f2;
+    border-radius: 4px;
   }
   li .entry-edit-form {
     margin-top: 0.5rem;
@@ -229,6 +270,10 @@
     .status.error { background: #331212; color: #ff8080; }
     .action-btn { color: #58a6ff; }
     .confirm-delete span { color: #999; }
+    .options-btn { color: #777; }
+    .options-btn:hover { color: #58a6ff; }
+    .entry-menu { background: #1c1c1c; border-color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+    .entry-menu .action-btn:hover { background: #2a2a2a; }
     li .entry-edit-form label { color: #999; }
     li .entry-edit-form input {
       background: #1c1c1c;
@@ -339,7 +384,8 @@
             '<div class="title">Item #' + (i + 1) + ' — ' + escapeHtml(entry.name) + '</div>' +
             '<div class="desc">' + escapeHtml(entry.desc) + '</div>' +
             '<a class="link" href="' + escapeHtml(entry.link) + '">View</a>' +
-            '<div class="actions">' +
+            '<button type="button" class="options-btn" aria-label="Options">⋮</button>' +
+            '<div class="entry-menu" hidden>' +
               '<button type="button" class="action-btn edit-btn">Edit</button>' +
               '<button type="button" class="action-btn delete-btn">Delete</button>' +
             '</div>' +
@@ -473,13 +519,37 @@
 
     var creationsList = document.getElementById('creations-list');
 
+    function collapseEntry(li) {
+      var menu = li.querySelector('.entry-menu');
+      if (menu) menu.hidden = true;
+      var confirmDel = li.querySelector('.confirm-delete');
+      if (confirmDel) confirmDel.hidden = true;
+      var editForm = li.querySelector('.entry-edit-form');
+      if (editForm && !editForm.hidden) {
+        editForm.hidden = true;
+        li.querySelector('.entry-view').hidden = false;
+      }
+    }
+
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('#creations-list > li[data-idx]').forEach(function (li) {
+        if (!li.contains(e.target)) collapseEntry(li);
+      });
+    });
+
     creationsList.addEventListener('click', function (e) {
       var li = e.target.closest('li[data-idx]');
       if (!li) return;
       var idx = Number(li.dataset.idx);
       var entry = currentEntries[idx];
 
-      if (e.target.classList.contains('edit-btn')) {
+      if (e.target.classList.contains('options-btn')) {
+        var thisMenu = li.querySelector('.entry-menu');
+        var wasHidden = thisMenu.hidden;
+        document.querySelectorAll('.entry-menu').forEach(function (m) { m.hidden = true; });
+        thisMenu.hidden = !wasHidden;
+      } else if (e.target.classList.contains('edit-btn')) {
+        li.querySelector('.entry-menu').hidden = true;
         li.querySelector('.entry-view').hidden = true;
         var form = li.querySelector('.entry-edit-form');
         form.querySelector('.edit-name').value = entry.name;
@@ -490,11 +560,10 @@
         li.querySelector('.entry-edit-form').hidden = true;
         li.querySelector('.entry-view').hidden = false;
       } else if (e.target.classList.contains('delete-btn')) {
-        li.querySelector('.actions').hidden = true;
+        li.querySelector('.entry-menu').hidden = true;
         li.querySelector('.confirm-delete').hidden = false;
       } else if (e.target.classList.contains('confirm-no')) {
         li.querySelector('.confirm-delete').hidden = true;
-        li.querySelector('.actions').hidden = false;
       } else if (e.target.classList.contains('confirm-yes')) {
         var yesBtn = e.target;
         var deleteStatusEl = li.querySelector('.delete-status');
