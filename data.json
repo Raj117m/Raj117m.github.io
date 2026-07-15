@@ -18,5 +18,10 @@
     "name": "GateCurry",
     "desc": "A phone-first fuel and mileage tracker for my Grand i10. Log odometer and liters at each fill-up, and it calculates true km-per-liter, cost-per-km, and average mileage over time. Uses my own cloud backend.",
     "link": "https://cloud.atomz.online/apps/fuel-tracker/"
+  },
+  {
+    "name": "Evident Audit Log",
+    "desc": "Every write to my personal cloud backend — across all my apps — is now cryptographically fingerprinted and chained. Uses SHA-256 hashing, HMAC signing, and OpenTimestamps anchoring to Bitcoin so entire history can be verified by anyone, even without trusting me. Comes with a visual admin dashboard that flags any tampered rows in red, and a public \"prove this record\" link feature that lets outsiders independently verify any single record's integrity against Bitcoin's timestamped chain — no login required.",
+    "link": "https://cloud.atomz.online/admin/audit"
   }
 ]
