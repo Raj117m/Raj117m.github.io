@@ -23,5 +23,10 @@
     "name": "Evident Audit Log",
     "desc": "Every write to my personal cloud backend — across all my apps — is now cryptographically fingerprinted and chained. Uses SHA-256 hashing, HMAC signing, and OpenTimestamps anchoring to Bitcoin so entire history can be verified by anyone, even without trusting me. Comes with a visual admin dashboard that flags any tampered rows in red, and a public \"prove this record\" link feature that lets outsiders independently verify any single record's integrity against Bitcoin's timestamped chain — no login required.",
     "link": "https://cloud.atomz.online/admin/audit"
+  },
+  {
+    "name": "Product Hunt Intelligence",
+    "desc": "A personal intelligence platform that pulls Product Hunt launches via the official API, stores them in a dedicated database on my cloud, and analyzes them with rankings, category performance, maker track records, and a transparent PH Score. Not a scraper - a long-term research archive. Currently holds 13,960 products.",
+    "link": "https://cloud.atomz.online/apps/product-hunt/"
   }
 ]
