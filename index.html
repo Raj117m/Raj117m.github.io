@@ -6,88 +6,114 @@
 <title>Raj's Catalogue</title>
 <style>
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
+    --bg: #faf8f5;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --accent: #2455a4;
+    --danger: #a71d1d;
+    --border: #e5e5e5;
   }
-  [hidden] {
-    display: none !important;
-  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: Georgia, 'Times New Roman', Times, serif;
     max-width: 640px;
     margin: 4rem auto;
     padding: 0 1.5rem;
-    line-height: 1.5;
-    color: #1a1a1a;
-    background: #fdfdfd;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
   }
   header {
     margin-bottom: 2.5rem;
   }
   h1 {
-    font-size: 1.75rem;
-    margin-bottom: 0.25rem;
+    font-size: 1.85rem;
+    margin: 0 0 0.25rem;
   }
   header p {
-    color: #666;
+    color: var(--text-muted);
     margin-top: 0;
+  }
+  section > h2 {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 1rem;
   }
   ol {
     list-style: none;
     padding: 0;
-    counter-reset: item;
+    margin: 0;
   }
   li {
-    counter-increment: item;
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 0.5rem;
-    margin: 0 -0.5rem;
-    border-bottom: 1px solid #e5e5e5;
-    border-radius: 6px;
-    position: relative;
-    transition: background 0.15s ease;
-  }
-  li:hover {
-    background: #f7f7f7;
-  }
-  li::before {
-    content: "#" counter(item);
-    font-weight: 600;
-    color: #999;
-    flex-shrink: 0;
-    width: 2.5rem;
-  }
-  li .title {
-    font-weight: 500;
-  }
-  li .desc {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 0.15rem;
-  }
-  li .link {
-    display: inline-block;
-    margin-top: 0.4rem;
-    font-size: 0.85rem;
-    color: #0366d6;
-    text-decoration: none;
-  }
-  li .link:hover {
-    text-decoration: underline;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
   }
   li.empty {
-    color: #999;
-    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    border-bottom: none;
   }
-  li .entry-view {
-    flex: 1;
-    padding-right: 1.75rem;
-  }
-  li .confirm-delete {
-    margin-top: 0.5rem;
+  .entry-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
+    cursor: pointer;
+  }
+  .chevron-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+  .chevron-btn.expanded {
+    transform: rotate(90deg);
+    color: var(--accent);
+  }
+  .entry-title {
+    transition: color 0.15s ease;
+  }
+  .entry-header:hover .entry-title {
+    color: var(--accent);
+  }
+  .entry-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease;
+  }
+  .entry-collapse.expanded {
+    grid-template-rows: 1fr;
+  }
+  .entry-collapse-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .entry-body-inner {
+    padding-top: 0.75rem;
+  }
+  .desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .link:hover { text-decoration: underline; }
+  .entry-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
   }
   .action-btn {
     background: none;
@@ -95,103 +121,73 @@
     padding: 0;
     font: inherit;
     font-size: 0.85rem;
-    color: #0366d6;
+    color: var(--text-muted);
     cursor: pointer;
   }
-  .action-btn:hover {
-    text-decoration: underline;
+  .action-btn:hover { text-decoration: underline; }
+  .action-btn.danger { color: var(--danger); }
+  .confirm-delete {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
   .confirm-delete span {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-muted);
   }
-  .options-btn {
-    position: absolute;
-    top: 1rem;
-    right: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    line-height: 1;
-    color: #999;
-    padding: 0.15rem 0.4rem;
-  }
-  .options-btn:hover {
-    color: #0366d6;
-  }
-  .entry-menu {
-    position: absolute;
-    top: 2.1rem;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 0.4rem;
-    min-width: 90px;
-  }
-  .entry-menu .action-btn {
-    text-align: left;
-    padding: 0.25rem 0.4rem;
-  }
-  .entry-menu .action-btn:hover {
-    text-decoration: none;
-    background: #f2f2f2;
-    border-radius: 4px;
-  }
-  li .entry-edit-form {
-    margin-top: 0.5rem;
+  .confirm-yes { color: var(--danger); }
+
+  .entry-edit-form, details form {
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
     max-width: 400px;
   }
-  li .entry-edit-form label {
+  .entry-edit-form label, details form label {
     display: flex;
     flex-direction: column;
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-muted);
     gap: 0.25rem;
   }
-  li .entry-edit-form input {
+  .entry-edit-form input, details form input {
     font: inherit;
     padding: 0.4rem 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 4px;
+    background: #fff;
+    color: var(--text);
   }
-  li .entry-edit-form .edit-actions {
+  .entry-edit-form input:focus, details form input:focus {
+    outline: 1px solid var(--accent);
+    border-color: var(--accent);
+  }
+  .edit-actions {
     display: flex;
     gap: 0.75rem;
     align-items: center;
   }
-  li .entry-edit-form button[type="submit"] {
+  button[type="submit"] {
     align-self: flex-start;
     font: inherit;
     padding: 0.4rem 0.9rem;
-    border: 1px solid #0366d6;
-    background: #0366d6;
+    border: 1px solid var(--accent);
+    background: var(--accent);
     color: #fff;
     border-radius: 4px;
     cursor: pointer;
   }
-  li .entry-edit-form button:disabled {
+  button[type="submit"]:disabled {
     opacity: 0.6;
     cursor: default;
   }
-  section > h2 {
-    font-size: 1.1rem;
-    color: #444;
-    margin-bottom: 1rem;
-  }
+
   footer {
     margin-top: 3rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted);
   }
 
   details {
@@ -200,53 +196,36 @@
   details summary {
     cursor: pointer;
     font-size: 0.9rem;
-    color: #0366d6;
-  }
-  details form {
-    margin-top: 1rem;
+    color: var(--accent);
+    list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    max-width: 400px;
+    align-items: center;
+    gap: 0.5rem;
   }
-  details form label {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.8rem;
-    color: #666;
-    gap: 0.25rem;
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: '▸';
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: inline-block;
+    transition: transform 0.15s ease;
   }
-  details form input {
-    font: inherit;
-    padding: 0.4rem 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  details form button {
-    align-self: flex-start;
-    font: inherit;
-    padding: 0.4rem 0.9rem;
-    border: 1px solid #0366d6;
-    background: #0366d6;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  details form button:disabled {
-    opacity: 0.6;
-    cursor: default;
+  details[open] summary::before {
+    transform: rotate(90deg);
   }
   details p.hint {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-muted);
     max-width: 400px;
+    margin-top: 1rem;
   }
+  details p.hint a { color: var(--accent); }
   .status {
     margin-top: 0.75rem;
     max-width: 400px;
     font-size: 0.85rem;
-    padding: 0.6rem 0.8rem;
-    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    border-radius: 4px;
   }
   .status.success {
     background: #eaf7ea;
@@ -260,36 +239,6 @@
     font-size: 0.8rem;
     color: #1a7a1a;
     margin-top: 0.5rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    body { color: #eaeaea; background: #121212; }
-    header p, li .desc, footer, details p.hint { color: #999; }
-    li { border-bottom-color: #2a2a2a; }
-    li:hover { background: #1a1a1a; }
-    section > h2 { color: #aaa; }
-    li .link { color: #58a6ff; }
-    details summary { color: #58a6ff; }
-    details form label { color: #999; }
-    details form input {
-      background: #1c1c1c;
-      color: #eaeaea;
-      border-color: #333;
-    }
-    .status.success { background: #123312; color: #6fcf6f; }
-    .status.error { background: #331212; color: #ff8080; }
-    .action-btn { color: #58a6ff; }
-    .confirm-delete span { color: #999; }
-    .options-btn { color: #777; }
-    .options-btn:hover { color: #58a6ff; }
-    .entry-menu { background: #1c1c1c; border-color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-    .entry-menu .action-btn:hover { background: #2a2a2a; }
-    li .entry-edit-form label { color: #999; }
-    li .entry-edit-form input {
-      background: #1c1c1c;
-      color: #eaeaea;
-      border-color: #333;
-    }
   }
 </style>
 </head>
@@ -306,7 +255,7 @@
     </ol>
 
     <details id="add-creation">
-      <summary>+ Add a creation</summary>
+      <summary>Add a creation</summary>
       <form id="add-form">
         <label>Name
           <input type="text" id="add-name" required>
@@ -323,7 +272,7 @@
     </details>
 
     <details id="settings">
-      <summary>⚙ Settings</summary>
+      <summary>Settings</summary>
       <form id="token-form">
         <label>GitHub token
           <input type="password" id="gh-token" placeholder="github_pat_...">
@@ -390,32 +339,36 @@
         var li = document.createElement('li');
         li.dataset.idx = i;
         li.innerHTML =
-          '<div class="entry-view">' +
-            '<div class="title">Item #' + (i + 1) + ' — ' + escapeHtml(entry.name) + '</div>' +
-            '<div class="desc">' + escapeHtml(entry.desc) + '</div>' +
-            '<a class="link" href="' + escapeHtml(entry.link) + '">View</a>' +
-            '<button type="button" class="options-btn" aria-label="Options">⋮</button>' +
-            '<div class="entry-menu" hidden>' +
-              '<button type="button" class="action-btn edit-btn">Edit</button>' +
-              '<button type="button" class="action-btn delete-btn">Delete</button>' +
-            '</div>' +
-            '<div class="confirm-delete" hidden>' +
-              '<span>Delete this entry?</span>' +
-              '<button type="button" class="action-btn confirm-yes">Yes</button>' +
-              '<button type="button" class="action-btn confirm-no">No</button>' +
-            '</div>' +
-            '<div class="delete-status status" hidden></div>' +
+          '<div class="entry-header">' +
+            '<button type="button" class="chevron-btn" aria-label="Toggle details" aria-expanded="false">▸</button>' +
+            '<span class="entry-title">Item #' + (i + 1) + ' — ' + escapeHtml(entry.name) + '</span>' +
           '</div>' +
-          '<form class="entry-edit-form" hidden>' +
-            '<label>Name<input type="text" class="edit-name" required></label>' +
-            '<label>Description<input type="text" class="edit-desc" required></label>' +
-            '<label>Link<input type="url" class="edit-link" required></label>' +
-            '<div class="edit-actions">' +
-              '<button type="submit">Save</button>' +
-              '<button type="button" class="action-btn cancel-edit-btn">Cancel</button>' +
+          '<div class="entry-collapse"><div class="entry-collapse-inner"><div class="entry-body-inner">' +
+            '<div class="entry-view">' +
+              '<div class="desc">' + escapeHtml(entry.desc) + '</div>' +
+              '<a class="link" href="' + escapeHtml(entry.link) + '">View</a>' +
+              '<div class="entry-actions">' +
+                '<button type="button" class="action-btn edit-btn">Edit</button>' +
+                '<button type="button" class="action-btn danger delete-btn">Delete</button>' +
+              '</div>' +
+              '<div class="confirm-delete" hidden>' +
+                '<span>Delete this entry?</span>' +
+                '<button type="button" class="action-btn confirm-yes">Yes</button>' +
+                '<button type="button" class="action-btn confirm-no">No</button>' +
+              '</div>' +
+              '<div class="delete-status status" hidden></div>' +
             '</div>' +
-            '<div class="edit-status status" hidden></div>' +
-          '</form>';
+            '<form class="entry-edit-form" hidden>' +
+              '<label>Name<input type="text" class="edit-name" required></label>' +
+              '<label>Description<input type="text" class="edit-desc" required></label>' +
+              '<label>Link<input type="url" class="edit-link" required></label>' +
+              '<div class="edit-actions">' +
+                '<button type="submit">Save</button>' +
+                '<button type="button" class="action-btn cancel-edit-btn">Cancel</button>' +
+              '</div>' +
+              '<div class="edit-status status" hidden></div>' +
+            '</form>' +
+          '</div></div></div>';
         ol.appendChild(li);
       });
     }
@@ -529,37 +482,20 @@
 
     var creationsList = document.getElementById('creations-list');
 
-    function collapseEntry(li) {
-      var menu = li.querySelector('.entry-menu');
-      if (menu) menu.hidden = true;
-      var confirmDel = li.querySelector('.confirm-delete');
-      if (confirmDel) confirmDel.hidden = true;
-      var editForm = li.querySelector('.entry-edit-form');
-      if (editForm && !editForm.hidden) {
-        editForm.hidden = true;
-        li.querySelector('.entry-view').hidden = false;
-      }
-    }
-
-    document.addEventListener('click', function (e) {
-      document.querySelectorAll('#creations-list > li[data-idx]').forEach(function (li) {
-        if (!li.contains(e.target)) collapseEntry(li);
-      });
-    });
-
     creationsList.addEventListener('click', function (e) {
       var li = e.target.closest('li[data-idx]');
       if (!li) return;
       var idx = Number(li.dataset.idx);
       var entry = currentEntries[idx];
 
-      if (e.target.classList.contains('options-btn')) {
-        var thisMenu = li.querySelector('.entry-menu');
-        var wasHidden = thisMenu.hidden;
-        document.querySelectorAll('.entry-menu').forEach(function (m) { m.hidden = true; });
-        thisMenu.hidden = !wasHidden;
+      if (e.target.closest('.entry-header')) {
+        var collapse = li.querySelector('.entry-collapse');
+        var chevron = li.querySelector('.chevron-btn');
+        var expanding = !collapse.classList.contains('expanded');
+        collapse.classList.toggle('expanded', expanding);
+        chevron.classList.toggle('expanded', expanding);
+        chevron.setAttribute('aria-expanded', String(expanding));
       } else if (e.target.classList.contains('edit-btn')) {
-        li.querySelector('.entry-menu').hidden = true;
         li.querySelector('.entry-view').hidden = true;
         var form = li.querySelector('.entry-edit-form');
         form.querySelector('.edit-name').value = entry.name;
@@ -570,7 +506,6 @@
         li.querySelector('.entry-edit-form').hidden = true;
         li.querySelector('.entry-view').hidden = false;
       } else if (e.target.classList.contains('delete-btn')) {
-        li.querySelector('.entry-menu').hidden = true;
         li.querySelector('.confirm-delete').hidden = false;
       } else if (e.target.classList.contains('confirm-no')) {
         li.querySelector('.confirm-delete').hidden = true;
