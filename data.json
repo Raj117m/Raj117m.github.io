@@ -28,5 +28,10 @@
     "name": "Product Hunt Intelligence",
     "desc": "A personal intelligence platform that pulls Product Hunt launches via the official API, stores them in a dedicated database on my cloud, and analyzes them with rankings, category performance, maker track records, and a transparent PH Score. Not a scraper — a long-term research archive. Currently holds 13,960 products.",
     "link": "https://cloud.atomz.online/apps/product-hunt/"
+  },
+  {
+    "name": "Notification Service",
+    "desc": "A universal iPhone notification system built into my personal cloud backend. Any of my creations — current or future — can fire native iOS push notifications through it, using ntfy as the delivery layer. Includes a scheduler for recurring reminders (daily times, intervals, IST-aware), a history log of every notification fired, and integration with my tamper-evident audit chain so notification history is cryptographically verifiable. Zero recurring cost, zero ads, fully self-hosted.",
+    "link": "https://cloud.atomz.online/apps/notifications/"
   }
 ]
