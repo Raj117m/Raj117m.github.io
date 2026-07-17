@@ -48,5 +48,10 @@
     "name": "Data Minimizer",
     "desc": "A privacy-first Python library that transforms incoming user data into aggregated statistics in real time, minimizing the storage of personal information while preserving valuable insights for analytics and reporting.",
     "link": "https://cloud.atomz.online/apps/data-minimizer/"
+  },
+  {
+    "name": "Backup System",
+    "desc": "Encrypted, periodic, verified backups of every SQLite database and data file in raj-backend, pushed to a private GitHub repo. Uses SQLite's .backup API for safe snapshots during writes, AES-256-GCM with per-file HKDF-derived keys for encryption, hash-chained into the existing audit log for tamper-evidence. Admin dashboard for on-demand runs and integrity verification. If this laptop dies, the data doesn't die with it.",
+    "link": "https://cloud.atomz.online/admin/backups"
   }
 ]
