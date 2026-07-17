@@ -53,5 +53,10 @@
     "name": "Backup System",
     "desc": "Encrypted, periodic, verified backups of every SQLite database and data file in raj-backend, pushed to a private GitHub repo. Uses SQLite's .backup API for safe snapshots during writes, AES-256-GCM with per-file HKDF-derived keys for encryption, hash-chained into the existing audit log for tamper-evidence. Admin dashboard for on-demand runs and integrity verification. If this laptop dies, the data doesn't die with it.",
     "link": "https://cloud.atomz.online/admin/backups"
+  },
+  {
+    "name": "raj_client",
+    "desc": "A Python SDK that centralizes HTTP + API-key + JSON boilerplate for talking to raj-backend. Provides Backend(api_key) with .records.{create, list, delete} and .files.{upload, download} methods, bounded retry logic (3 attempts, exponential backoff, 30s timeout, no retry on 4xx errors), and a typed error hierarchy (AuthError, NotFoundError, ServerError, NetworkError). Kg-Calibrator has been refactored to use it as the first proof-of-integration; every future creation that talks to raj-backend imports this instead of duplicating HTTP code. First real shared infrastructure across creations.",
+    "link": "https://github.com/Raj117m/raj-backend/tree/main/raj_client"
   }
 ]
