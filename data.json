@@ -33,5 +33,10 @@
     "name": "Notification Service",
     "desc": "A universal iPhone notification system built into my personal cloud backend. Any of my creations — current or future — can fire native iOS push notifications through it, using ntfy as the delivery layer. Includes a scheduler for recurring reminders (daily times, intervals, IST-aware), a history log of every notification fired, and integration with my tamper-evident audit chain so notification history is cryptographically verifiable. Zero recurring cost, zero ads, fully self-hosted.",
     "link": "https://cloud.atomz.online/apps/notifications/"
+  },
+  {
+    "name": "Foot & Shoe Fit Guide",
+    "desc": "A vintage-textbook-style informational guide about foot shape and shoe fit. Covers toe length types (Egyptian, Greek, Roman, Germanic), arch height with wet-test instructions, matching shoe features, and everyday-object measurement references (credit card, ₹100 note, A4, smartphone) for people who don't have a ruler handy. Built for anyone who's had shoes that fit the size but not the shape — starting with my sister's real inconvenience.",
+    "link": "https://cloud.atomz.online/apps/foot-guide/"
   }
 ]
