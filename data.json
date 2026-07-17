@@ -43,5 +43,10 @@
     "name": "Relay – Secure Emergency Evidence Recorder",
     "desc": "An end-to-end encrypted emergency recording platform that securely captures, uploads, and preserves audio evidence in real time. Features trusted contacts, live listening, encrypted cloud storage, integrity verification, and tamper-evident audit log",
     "link": "https://cloud.atomz.online/apps/relay/"
+  },
+  {
+    "name": "Data Minimizer",
+    "desc": "A privacy-first Python library that transforms incoming user data into aggregated statistics in real time, minimizing the storage of personal information while preserving valuable insights for analytics and reporting.",
+    "link": "https://cloud.atomz.online/apps/data-minimizer/"
   }
 ]
