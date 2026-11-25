@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATOMZ demo shelf</title>
+<style>
+  :root { --bg:#0e0e10; --card:#1a1a1d; --line:#2b2b30; --text:#f4f4f5; --dim:#a1a1aa; --accent:#FD6D03; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.45 -apple-system, "Inter", "Segoe UI", Roboto, sans-serif; }
+  header { padding:20px 16px 8px; max-width:1100px; margin:0 auto; }
+  h1 { margin:0 0 4px; font-size:22px; letter-spacing:.3px; }
+  h1 span { color:var(--accent); }
+  .sub { margin:0; color:var(--dim); font-size:14px; }
+  .bar { position:sticky; top:0; z-index:5; background:var(--bg); padding:10px 16px 12px; border-bottom:1px solid var(--line); }
+  .bar-in { max-width:1100px; margin:0 auto; }
+  input[type=search] { width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; }
+  input[type=search]:focus { outline:2px solid var(--accent); }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:10px 0 0; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex:0 0 auto; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:14px; cursor:pointer; white-space:nowrap; }
+  .chip[aria-pressed=true] { background:var(--accent); border-color:var(--accent); color:#111; font-weight:600; }
+  main { max-width:1100px; margin:0 auto; padding:14px 16px 60px; }
+  .count { color:var(--dim); font-size:13px; margin:0 0 10px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+  .top { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+  .name { font-size:17px; font-weight:650; margin:0; }
+  .star { background:none; border:0; color:var(--dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 4px; }
+  .star[aria-pressed=true] { color:var(--accent); }
+  .line { margin:0; color:var(--dim); font-size:14px; }
+  .tags { display:flex; flex-wrap:wrap; gap:6px; }
+  .tag { font-size:12px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); color:var(--dim); }
+  .note { font-size:12px; padding:3px 9px; border-radius:999px; background:#2a1c10; color:#ffb27a; border:1px solid #4a2f17; }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:4px; }
+  a.open { background:var(--accent); color:#111; text-decoration:none; font-weight:650; padding:10px 16px; border-radius:12px; font-size:15px; }
+  a.alt { color:var(--text); text-decoration:none; border:1px solid var(--line); padding:10px 14px; border-radius:12px; font-size:14px; }
+  a:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .empty { color:var(--dim); padding:30px 0; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>ATOMZ</span> demo shelf</h1>
+  <p class="sub">Tap a shop type, then tap Open. Star the ones you use most and they jump to the top.</p>
+</header>
+<div class="bar"><div class="bar-in">
+  <input type="search" id="q" placeholder="Search by name or what it does" aria-label="Search demos" autocomplete="off">
+  <div class="chips" id="chips" role="group" aria-label="Shop type"></div>
+</div></div>
+<main>
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>Nothing matches. Clear the search or pick "All".</p>
+</main>
+
+<script>
+// ---- The list. To add a demo, add one block here (name, line, types, url). ----
+// types must be keys of TYPES. "url" can be "" for code-only projects. "note" is a small warning chip.
+var TYPES = {
+  food:   "Restaurants & cafes",
+  gym:    "Gyms",
+  staff:  "Staff & attendance",
+  social: "Social & promos",
+  money:  "Finance",
+  data:   "Data & analytics",
+  creative: "3D & creative",
+  tools:  "Tools & explainers"
+};
+var DEMOS = [
+  { name:"SM Caffinity", line:"Cafe ordering for customers, a staff order queue and a QR table generator.", types:["food"],
+    url:"https://sm-cafinity.vercel.app", extra:[["Staff view","https://sm-cafinity.vercel.app/staff"],["QR tables","https://sm-cafinity.vercel.app/qr"]], note:"Staff view needs a PIN" },
+  { name:"Basil House", line:"Bistro website with menu and dining details.", types:["food"],
+    url:"https://raj117m.github.io/basil-house-demo/" },
+  { name:"Coffee reel", line:"A short showcase video for an artisan coffee brand.", types:["food","social"],
+    url:"https://raj117m.github.io/coffee-reel/" },
+  { name:"Kims Cafe (CafeFlow)", line:"Restaurant till and live ordering system.", types:["food"],
+    url:"", repo:"https://github.com/Raj117m/kims-cafe", note:"Code only" },
+  { name:"Pulse Gym OS", line:"Gym management: members, plans and staff in one place.", types:["gym","staff"],
+    url:"", repo:"https://github.com/Raj117m/gym-software", note:"Code only" },
+  { name:"Staff payroll and attendance", line:"Salary calculator, staff register and attendance view.", types:["staff"],
+    url:"https://raj117m.github.io/meats-plants-payroll/", repo:"https://github.com/Raj117m/meats-plants-payroll", note:"Made-up sample data" },
+  { name:"Meats and Plants live app", line:"The real shop system: till, stock, staff shifts and attendance.", types:["staff","food"],
+    url:"https://meats-and-plants-app.vercel.app/", note:"Real client. Needs a PIN. Show only with their OK" },
+  { name:"ATOMZ promo", line:"An interactive promo that plays like a short ad.", types:["social"],
+    url:"https://raj117m.github.io/atomz-promo/", repo:"https://github.com/Raj117m/atomz-promo" },
+  { name:"ATOMZ reel", line:"A fast social reel player.", types:["social"],
+    url:"https://raj117m.github.io/atomz-reel/", repo:"https://github.com/Raj117m/atomz-reel" },
+  { name:"ATOMZ trend reel", line:"A trend-style reel showcase.", types:["social"],
+    url:"https://raj117m.github.io/atomz-trend-reel/", repo:"https://github.com/Raj117m/atomz-trend-reel" },
+  { name:"Retirement planner", line:"Enter your numbers and see how savings grow.", types:["money","tools"],
+    url:"https://raj117m.github.io/retirement-planning-site/", repo:"https://github.com/Raj117m/retirement-planning-site" },
+  { name:"STC Algo dashboard", line:"A trading and analytics dashboard.", types:["money","data"],
+    url:"https://raj117m.github.io/STC-ALGO/", repo:"https://github.com/Raj117m/STC-ALGO" },
+  { name:"STC Algo terminal", line:"A trading terminal prototype.", types:["money"],
+    url:"https://raj117m.github.io/stc-alfo-ui-cursor-at1/", repo:"https://github.com/Raj117m/stc-alfo-ui-cursor-at1" },
+  { name:"ELECOUS v2", line:"A demand intelligence screen: what will sell and when.", types:["data"],
+    url:"https://raj117m.github.io/elecous-v2/", repo:"https://github.com/Raj117m/elecous-v2" },
+  { name:"ELECOUS core", line:"The demand intelligence engine behind it.", types:["data"],
+    url:"", repo:"https://github.com/Raj117m/elecous", note:"Code only" },
+  { name:"Spike intelligence", line:"Learns what drives demand spikes.", types:["data"],
+    url:"", repo:"https://github.com/Raj117m/spike-intelligence", note:"Code only" },
+  { name:"Knowledge graph calibrator", line:"Tune how strongly things in a knowledge graph are linked.", types:["data","tools"],
+    url:"https://raj117m.github.io/kg-calibrator/", repo:"https://github.com/Raj117m/kg-calibrator" },
+  { name:"Fuel tracker", line:"Log fuel and see mileage and cost each day.", types:["tools"],
+    url:"https://raj117m.github.io/fuel-tracker/", repo:"https://github.com/Raj117m/fuel-tracker" },
+  { name:"Blockchain explainer", line:"See how blocks and hashes work, step by step.", types:["tools"],
+    url:"https://raj117m.github.io/blockchain-explainer/", repo:"https://github.com/Raj117m/blockchain-explainer" },
+  { name:"3D gem", line:"A 3D gemstone you can turn, with lights and facets.", types:["creative"],
+    url:"https://raj117m.github.io/3d-gem/", repo:"https://github.com/Raj117m/3d-gem" },
+  { name:"Silk flora", line:"A 3D silk cloth you can push around.", types:["creative"],
+    url:"https://raj117m.github.io/silk-flora-fixed/", repo:"https://github.com/Raj117m/silk-flora-fixed" },
+  { name:"Vesper", line:"A sound-reactive visual experience.", types:["creative"],
+    url:"https://raj117m.github.io/vesper/", repo:"https://github.com/Raj117m/vesper" }
+];
+
+// ---- Page logic. ----
+var PIN_KEY = "atomz-shelf-pins";
+var pins = {};
+try { pins = JSON.parse(localStorage.getItem(PIN_KEY) || "{}") || {}; } catch (e) { pins = {}; }
+var state = { type: "all", q: "" };
+
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+function savePins() { try { localStorage.setItem(PIN_KEY, JSON.stringify(pins)); } catch (e) {} }
+
+function readHash() {
+  var h = decodeURIComponent((location.hash || "").replace(/^#/, ""));
+  state.type = (h === "all" || TYPES[h]) ? h : "all";
+}
+function writeHash() { history.replaceState(null, "", "#" + state.type); }
+
+function drawChips() {
+  var chips = document.getElementById("chips");
+  var html = '<button class="chip" data-t="all" aria-pressed="' + (state.type === "all") + '">All</button>';
+  Object.keys(TYPES).forEach(function (k) {
+    html += '<button class="chip" data-t="' + k + '" aria-pressed="' + (state.type === k) + '">' + esc(TYPES[k]) + '</button>';
+  });
+  chips.innerHTML = html;
+}
+
+function matches(d) {
+  if (state.type !== "all" && d.types.indexOf(state.type) < 0) return false;
+  var q = state.q.trim().toLowerCase();
+  if (!q) return true;
+  return (d.name + " " + d.line + " " + d.types.map(function (t) { return TYPES[t]; }).join(" ")).toLowerCase().indexOf(q) >= 0;
+}
+
+function card(d) {
+  var tags = d.types.map(function (t) { return '<span class="tag">' + esc(TYPES[t]) + '</span>'; }).join("");
+  var note = d.note ? '<span class="note">' + esc(d.note) + '</span>' : "";
+  var acts = "";
+  if (d.url) acts += '<a class="open" href="' + esc(d.url) + '" target="_blank" rel="noopener">Open</a>';
+  (d.extra || []).forEach(function (x) { acts += '<a class="alt" href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; });
+  if (d.repo) acts += '<a class="alt" href="' + esc(d.repo) + '" target="_blank" rel="noopener">Code</a>';
+  var on = !!pins[d.name];
+  return '<article class="card"><div class="top"><h2 class="name">' + esc(d.name) + '</h2>' +
+    '<button class="star" data-pin="' + esc(d.name) + '" aria-pressed="' + on + '" aria-label="Pin ' + esc(d.name) + '">' + (on ? "★" : "☆") + '</button></div>' +
+    '<p class="line">' + esc(d.line) + '</p><div class="tags">' + tags + note + '</div><div class="actions">' + acts + '</div></article>';
+}
+
+function draw() {
+  var list = DEMOS.filter(matches).sort(function (a, b) { return (pins[b.name] ? 1 : 0) - (pins[a.name] ? 1 : 0); });
+  document.getElementById("grid").innerHTML = list.map(card).join("");
+  document.getElementById("count").textContent = list.length + " of " + DEMOS.length + " demos";
+  document.getElementById("empty").hidden = list.length > 0;
+}
+
+document.getElementById("chips").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-t]"); if (!b) return;
+  state.type = b.getAttribute("data-t"); writeHash(); drawChips(); draw();
+});
+document.getElementById("grid").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-pin]"); if (!b) return;
+  var n = b.getAttribute("data-pin"); if (pins[n]) delete pins[n]; else pins[n] = 1; savePins(); draw();
+});
+document.getElementById("q").addEventListener("input", function (e) { state.q = e.target.value; draw(); });
+window.addEventListener("hashchange", function () { readHash(); drawChips(); draw(); });
+
+readHash(); drawChips(); draw();
+</script>
+</body>
+</html>
