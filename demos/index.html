@@ -37,6 +37,8 @@
   a.alt { color:var(--text); text-decoration:none; border:1px solid var(--line); padding:10px 14px; border-radius:12px; font-size:14px; }
   a:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .empty { color:var(--dim); padding:30px 0; text-align:center; }
+  .login { font-size:12px; padding:3px 9px; border-radius:999px; background:#10261a; color:#7ee2a8; border:1px solid #1f4a30; word-break:break-all; }
+  button.alt { background:none; cursor:pointer; font-family:inherit; }
 </style>
 </head>
 <body>
@@ -69,7 +71,8 @@ var TYPES = {
 };
 var DEMOS = [
   { name:"SM Caffinity", line:"Cafe ordering for customers, a staff order queue and a QR table generator.", types:["food"],
-    url:"https://sm-cafinity.vercel.app", extra:[["Staff view","https://sm-cafinity.vercel.app/staff"],["QR tables","https://sm-cafinity.vercel.app/qr"]], note:"Staff view needs a PIN" },
+    url:"https://sm-cafinity-demo.onrender.com/", extra:[["Staff view","https://sm-cafinity-demo.onrender.com/staff"],["QR tables","https://sm-cafinity-demo.onrender.com/qr"]],
+    note:"Staff view needs a login. First open can take about 20 seconds to wake up" },
   { name:"Basil House", line:"Bistro website with menu and dining details.", types:["food"],
     url:"https://raj117m.github.io/basil-house-demo/" },
   { name:"Coffee reel", line:"A short showcase video for an artisan coffee brand.", types:["food","social"],
@@ -118,6 +121,12 @@ var DEMOS = [
 var PIN_KEY = "atomz-shelf-pins";
 var pins = {};
 try { pins = JSON.parse(localStorage.getItem(PIN_KEY) || "{}") || {}; } catch (e) { pins = {}; }
+// Login notes are typed by you on your own phone and kept only in this browser. They are never in this
+// file and never on the internet, so a password can be kept next to its demo without publishing it.
+var NOTE_KEY = "atomz-shelf-logins";
+var logins = {};
+try { logins = JSON.parse(localStorage.getItem(NOTE_KEY) || "{}") || {}; } catch (e) { logins = {}; }
+function saveLogins() { try { localStorage.setItem(NOTE_KEY, JSON.stringify(logins)); } catch (e) {} }
 var state = { type: "all", q: "" };
 
 function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
@@ -148,10 +157,12 @@ function matches(d) {
 function card(d) {
   var tags = d.types.map(function (t) { return '<span class="tag">' + esc(TYPES[t]) + '</span>'; }).join("");
   var note = d.note ? '<span class="note">' + esc(d.note) + '</span>' : "";
+  if (logins[d.name]) note += '<span class="login">Login: ' + esc(logins[d.name]) + '</span>';
   var acts = "";
   if (d.url) acts += '<a class="open" href="' + esc(d.url) + '" target="_blank" rel="noopener">Open</a>';
   (d.extra || []).forEach(function (x) { acts += '<a class="alt" href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; });
   if (d.repo) acts += '<a class="alt" href="' + esc(d.repo) + '" target="_blank" rel="noopener">Code</a>';
+  if (/login|PIN/i.test(d.note || "")) acts += '<button type="button" class="alt" data-login="' + esc(d.name) + '">' + (logins[d.name] ? "Edit login" : "Add login") + '</button>';
   var on = !!pins[d.name];
   return '<article class="card"><div class="top"><h2 class="name">' + esc(d.name) + '</h2>' +
     '<button class="star" data-pin="' + esc(d.name) + '" aria-pressed="' + on + '" aria-label="Pin ' + esc(d.name) + '">' + (on ? "★" : "☆") + '</button></div>' +
@@ -172,6 +183,14 @@ document.getElementById("chips").addEventListener("click", function (e) {
 document.getElementById("grid").addEventListener("click", function (e) {
   var b = e.target.closest("button[data-pin]"); if (!b) return;
   var n = b.getAttribute("data-pin"); if (pins[n]) delete pins[n]; else pins[n] = 1; savePins(); draw();
+});
+document.getElementById("grid").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-login]"); if (!b) return;
+  var n = b.getAttribute("data-login");
+  var t = window.prompt("Login for " + n + " (saved only on this phone, never published). Leave empty to remove.", logins[n] || "");
+  if (t === null) return;
+  t = t.trim(); if (t) logins[n] = t; else delete logins[n];
+  saveLogins(); draw();
 });
 document.getElementById("q").addEventListener("input", function (e) { state.q = e.target.value; draw(); });
 window.addEventListener("hashchange", function () { readHash(); drawChips(); draw(); });
